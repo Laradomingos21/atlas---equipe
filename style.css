@@ -17,6 +17,9 @@
   --display: 'Alata', 'Helvetica Neue', sans-serif; /* fonte dos títulos */
   --body: 'Inter', 'Arial', sans-serif;              /* fonte dos textos */
 
+  --ease: cubic-bezier(.16,1,.3,1); /* curva de suavização usada nas animações */
+}
+
 /* ============ TEMA CLARO ============
    Essas cores substituem as de cima quando o site
    estiver no modo "claro" (data-theme="light" no HTML) */
@@ -36,8 +39,6 @@
 :root[data-theme="light"] header {
   mix-blend-mode: normal;
 }
-  --ease: cubic-bezier(.16,1,.3,1); /* curva de suavização usada nas animações */
-}
 
 /* Reset básico: zera espaçamentos padrão do navegador */
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -50,6 +51,35 @@ body {
   font-weight:300;
   overflow-x:hidden; /* impede rolagem horizontal indesejada */
   cursor:default;
+  transition:background-color 0.5s var(--ease), color 0.5s var(--ease); /* troca suave ao mudar de tema */
+}
+
+.pedido {
+    flex: 1; /* Ocupa 1 parte do espaço (equilibra com a logo) */
+    display: flex;
+    justify-content: flex-end; /* Empurra o botão e o ícone para o canto direito */
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-links {
+      flex: 2; /* Ocupa o dobro de espaço para caber todos os links confortavelmente */
+    display: flex;
+    justify-content: center; /* Centraliza o texto no meio da pílula */
+    gap: 20px;
+}
+
+/* Ícone do menu hambúrguer — fica escondido no desktop,
+   só aparece na media query de telas pequenas lá embaixo */
+.hamburger {
+  display: none;
+  flex: 1;
+  text-align: right;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: var(--white);
+  z-index: 600;
+  user-select: none;
 }
 
 /* Se a pessoa preferir menos animação (configuração de acessibilidade
@@ -103,14 +133,11 @@ header {
   mix-blend-mode:difference; /* faz o texto do menu inverter cor conforme o fundo */
 }
 .logo {
+  flex: 1; /* equilibra visualmente com .pedido do outro lado */
   font-family:var(--display);
   font-size:1.25rem;
   letter-spacing:0.03em;
   color:var(--white);
-}
-nav ul {
-  display:flex; gap:clamp(20px, 3vw, 40px);
-  list-style:none;
 }
 nav a {
   font-size:0.78rem;
@@ -127,10 +154,39 @@ nav a::after {
   transition:width 0.4s var(--ease);
 }
 nav a:hover::after { width:100%; }
-.nav-links { display:flex; }
 
-/* Botão "Menu" — só some/aparece no celular (ver media query lá embaixo) */
-.menu-toggle { display:none; background:none; border:none; color:var(--white); font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; }
+/* Transforma o botão num Grid para empilhar os ícones na mesma célula */
+.toggle-tema {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    display: grid; /* Mudança vital aqui */
+    place-items: center; /* Centraliza tudo no mesmo eixo */
+    cursor: pointer;
+    overflow: hidden; /* Evita que a rotação vaze o tamanho do botão */
+}
+
+.toggle-tema i {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 1.5rem;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+}
+
+/* ESTADO CLARO (Padrão) */
+.toggle-tema .icone-sol {
+    color: #331E17;
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+.toggle-tema .icone-lua {
+    color: #e6dcd8; 
+    opacity: 0;
+    transform: rotate(-90deg); /* Lua fica deitada e invisível aguardando */
+    pointer-events: none;
+}
+
 
 /* ============ SEÇÃO HERO (topo da página) ============ */
 .hero {
@@ -338,7 +394,7 @@ section {
   gap:32px;
   margin-top:64px;
   padding-top:48px;
-  border-top:1px solid var(--line);
+  border-top:1px solid var(--line); 
 }
 .stat-num {
   font-family:var(--display);
@@ -392,6 +448,7 @@ section {
 }
 
 /* ============ SEÇÃO "EQUIPE" ============ */
+
 .team-grid {
   display:grid;
   grid-template-columns:repeat(5,1fr); /* 5 cartões lado a lado */
@@ -406,6 +463,7 @@ section {
   transition:background 0.5s var(--ease);
 }
 .member:hover { background:var(--surface); }
+
 .member-photo {
   width:88px; height:88px;
   border-radius:50%; /* bolinha redonda com as iniciais */
@@ -416,7 +474,17 @@ section {
   font-size:1.6rem;
   color:var(--grey);
   border:1px solid var(--line);
+  overflow: hidden; /* IMPORTANTE: Corta a imagem em formato de círculo */
 }
+
+/* Nova regra para controlar as fotos */
+.member-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Faz a foto preencher o círculo sem distorcer */
+  object-position: center; /* Mantém o rosto centralizado */
+}
+
 .member-name {
   font-size:1rem;
   font-weight:500;
@@ -428,6 +496,7 @@ section {
   letter-spacing:0.05em;
   color:var(--grey);
 }
+
 
 /* ============ SEÇÃO "PROJETOS" ============ */
 .project-list {
@@ -573,8 +642,24 @@ footer {
   section { padding:110px 24px; }
 }
 @media (max-width: 600px) {
-  .nav-links { display:none; }      /* esconde o menu normal */
-  .menu-toggle { display:block; }   /* mostra o botão "Menu" */
-  .team-grid { grid-template-columns:1fr 1fr; }
-  .hero-cta { flex-direction:column; align-items:flex-start; } /* botões empilhados */
+  /* O menu normal vira um painel em tela cheia, escondido até o hambúrguer ser clicado */
+  .nav-links {
+    display: none;
+    position: fixed;
+    inset: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    background: var(--black);
+    z-index: 400;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { font-size: 1rem; }
+
+  .hamburger { display: block; } /* mostra o botão hambúrguer */
+
+  #theme-toggle { margin-left: 16px; width: 34px; height: 34px; }
+  .team-grid { grid-template-columns: 1fr 1fr; }
+  .hero-cta { flex-direction: column; align-items: flex-start; } /* botões empilhados */
 }

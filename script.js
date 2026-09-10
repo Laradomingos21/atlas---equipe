@@ -69,3 +69,37 @@ document.querySelector('.menu-toggle')?.addEventListener('click', () => {
     a.scrollIntoView();
   });
 });
+
+/* ===================================================
+   MENU HAMBÚRGUER (mobile)
+   Cole este trecho dentro do seu script.js já existente
+   (não tenho o conteúdo original dele, então não posso
+   sobrescrevê-lo — só adicione este bloco a ele).
+   =================================================== */
+
+const hamburger = document.querySelector('.hamburger');
+const navLinks = document.querySelector('.nav-links');
+
+hamburger.addEventListener('click', () => {
+  const isOpen = navLinks.classList.toggle('open');
+  hamburger.textContent = isOpen ? '✕' : '☰';
+  hamburger.setAttribute('aria-expanded', isOpen);
+});
+
+// Permite abrir o menu também pelo teclado (Enter/Espaço), já que
+// o hambúrguer é uma <div role="button"> e não um <button> nativo
+hamburger.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    hamburger.click();
+  }
+});
+
+// Fecha o menu automaticamente ao clicar em qualquer link
+navLinks.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    hamburger.textContent = '☰';
+    hamburger.setAttribute('aria-expanded', 'false');
+  });
+});
